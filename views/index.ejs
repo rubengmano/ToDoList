@@ -5,7 +5,14 @@
     <title>To Do List</title>
   </head>
   <body>
-    <!-- Add a marker to place a particular file -->
-    <h1>It's a <%= weekDay %></h1>
+
+    <%# In order to work is needed the scriplet tag  %>
+    <% if(weekDay === 'Saturday' || weekDay === 'Sunday'){ %>
+      <!-- Add a marker to place a particular file -->
+      <h1 style="color: purple"><%= weekDay %> ToDo List</h1>
+    <% } else { %>
+      <h1 style="color: blue"><%= weekDay %> ToDo List</h1>
+    <% } %>
+
   </body>
 </html>
