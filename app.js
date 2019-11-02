@@ -10,6 +10,8 @@ const app = express();
 app.set('view engine', 'ejs');
 // Set the body parser to be abled to read
 app.use(bodyParser.urlencoded({extended: true}));
+// Define the path to public files
+app.use(express.static('public'));
 
 // because of scope it's necessary to declare the variable at a global level
 let items = ['Buy Food', 'Cook Food', 'Eat Food'];
