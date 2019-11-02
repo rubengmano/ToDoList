@@ -2,6 +2,8 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+// require local module
+const date = require(__dirname + '/date.js');
 
 const app = express();
 
@@ -20,18 +22,8 @@ let items = ['Buy Food', 'Cook Food', 'Eat Food'];
 let workItems = [];
 
 app.get("/", (req, res) => {
-  let today = new Date();
-  console.log(today);
-  let currentDay = today.getDay();
 
-  let options = {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
-  }
-
-  let day = today.toLocaleDateString("en-US", options);
-
+  let day = date.getDate();
   // it's necessary to have a views folder and the file inside
   res.render('index', {
     ListTitle: day,
