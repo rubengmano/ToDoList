@@ -6,13 +6,25 @@
   </head>
   <body>
 
-    <%# In order to work is needed the scriplet tag  %>
-    <% if(weekDay === 'Saturday' || weekDay === 'Sunday'){ %>
+    <!-- <%# In order to work is needed the scriplet tag  %> -->
+    <!-- <% if(weekDay === 'Saturday' || weekDay === 'Sunday'){ %> -->
       <!-- Add a marker to place a particular file -->
-      <h1 style="color: purple"><%= weekDay %> ToDo List</h1>
-    <% } else { %>
-      <h1 style="color: blue"><%= weekDay %> ToDo List</h1>
-    <% } %>
+      <!-- <h1 style="color: purple"><%= weekDay %> ToDo List</h1> -->
+    <!-- <% } else { %> -->
+      <!-- <h1 style="color: blue"><%= weekDay %> ToDo List</h1> -->
+    <!-- <% } %> -->
+
+    <h1><%= weekDay %></h1>
+    <ul>
+      <%for(let i = 0; i < newListItems.length; i++){%>
+        <li> <%=newListItems[i]%></li>
+      <%}%>
+    </ul>
+
+    <form action="/" method="post">
+      <input type="text" name="newItem">
+      <button type="submit" name="button">Add</button>
+    </form>
 
   </body>
 </html>
