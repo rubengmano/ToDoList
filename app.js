@@ -2,8 +2,8 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-// require local module
-const date = require(__dirname + '/date.js');
+// require mongoose model
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -17,17 +17,57 @@ app.use(bodyParser.urlencoded({
 // Define the path to public files
 app.use(express.static('public'));
 
-// because of scope it's necessary to declare the variable at a global level
-let items = ['Buy Food', 'Cook Food', 'Eat Food'];
-let workItems = [];
+// // because of scope it's necessary to declare the variable at a global level
+// let items = ['Buy Food', 'Cook Food', 'Eat Food'];
+// let workItems = [];
+
+// connect and create or change to db
+mongoose.connect('mongodb://localhost/todolistDB', {useNewUrlParser: true, useUnifiedTopology: true });
+
+// Check if the connection was succefull
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log("Connection Succefull");
+});
+
+// ---------------------------------------SCHEMAS---------------------------------------------------------
+// Create Schema
+const itemsSchema = new mongoose.Schema({
+  name: String
+});
+
+// ---------------------------------------COLLECTIONS-----------------------------------------------------
+// Mongoose will convert the word Fruit into plurar to crate a collection
+const Item = mongoose.model('Item', itemsSchema);
+
+// ----------------------------------------DOCUMENTS------------------------------------------------------
+const item1 = new Item({
+  name: 'Welcome to the List'
+});
+
+const item2 = new Item({
+  name: 'Hit the + button to add a new Item'
+});
+
+const item3 = new Item({
+  name: '<-- Hit this to delete an item'
+});
+
+const defaultItems = [item1, item2, item3];
+
+// ----------------------------------------ADD-DOCUMENTS-------------------------------------------------
+// Item.insertMany(defaultItems, function(err){
+//   if(err) console.log(err);
+//   else console.log('Succefully saved default Items');
+// });
 
 app.get("/", (req, res) => {
 
-  let day = date.getDate();
   // it's necessary to have a views folder and the file inside
   res.render('index', {
-    ListTitle: day,
-    newListItems: items
+    ListTitle: 'Today',
+    newListItems: defaultItems
   });
 });
 
