@@ -56,18 +56,29 @@ const item3 = new Item({
 
 const defaultItems = [item1, item2, item3];
 
-// ----------------------------------------ADD-DOCUMENTS-------------------------------------------------
-// Item.insertMany(defaultItems, function(err){
-//   if(err) console.log(err);
-//   else console.log('Succefully saved default Items');
-// });
+
 
 app.get("/", (req, res) => {
 
-  // it's necessary to have a views folder and the file inside
-  res.render('index', {
-    ListTitle: 'Today',
-    newListItems: defaultItems
+//--------------------------------------FIND-DOCUMENTS--------------------------------------------------
+
+  Item.find({}, function (err, foundItems) {
+    if (foundItems.length === 0){
+// ----------------------------------------ADD-DOCUMENTS-------------------------------------------------
+      Item.insertMany(defaultItems, function(err){
+        if(err) console.log(err);
+        else console.log('Succefully saved default Items');
+      });
+      // render the objects after adding them to the db
+      res.redirect('/');
+    }
+    else {
+      // it's necessary to have a views folder and the file inside
+      res.render('index', {
+        ListTitle: 'Today',
+        newListItems: foundItems
+      });
+    }
   });
 });
 
