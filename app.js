@@ -84,18 +84,18 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => {
 
-  let newItem = req.body.newItem;
+  const itemName = req.body.newItem;
+  // Create the new item
+  const item = new Item({
+    name: itemName
+  });
 
-  console.log(req.body.list);
+  // save the new item into the collection
+  item.save();
 
-  if (req.body.list === 'Work') {
-    workItems.push(newItem);
-    res.redirect('/work');
-  } else {
-    items.push(newItem);
-    // It's redirect to the get method to complete the ejs file
-    res.redirect('/');
-  }
+  // render the objects after adding them to the db
+  res.redirect('/');
+
 });
 
 app.get('/work', (req, res) => {
