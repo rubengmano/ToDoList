@@ -5,6 +5,10 @@ const bodyParser = require("body-parser");
 // require mongoose model
 const mongoose = require('mongoose');
 
+// Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
+// by default, you need to set it to false.
+mongoose.set('useFindAndModify', false);
+
 const app = express();
 
 // tell the app to use ejs
@@ -97,6 +101,27 @@ app.post("/", (req, res) => {
   res.redirect('/');
 
 });
+
+// Delete Items
+app.post("/delete", (req, res) => {
+
+  // get the item id
+  const checkedItemId = req.body.checkbox;
+
+  // delete the item
+  Item.findByIdAndRemove(checkedItemId, function(err){
+    if(err) console.log(err);
+    else console.log(`Succefully deleted item with id: ${checkedItemId}`);
+  });
+
+  setTimeout(function(){
+    // render the objects after adding them to the db
+    res.redirect('/');
+  }, 100);
+
+
+});
+
 
 app.get('/work', (req, res) => {
   res.render('index', {
