@@ -41,9 +41,16 @@ const itemsSchema = new mongoose.Schema({
   name: String
 });
 
+// Create list schema for dynamic routes
+const listSchema = new mongoose.Schema({
+  name: String,
+  items: [itemsSchema]
+});
+
 // ---------------------------------------COLLECTIONS-----------------------------------------------------
 // Mongoose will convert the word Fruit into plurar to crate a collection
 const Item = mongoose.model('Item', itemsSchema);
+const List = mongoose.model('List', listSchema);
 
 // ----------------------------------------DOCUMENTS------------------------------------------------------
 const item1 = new Item({
@@ -59,8 +66,6 @@ const item3 = new Item({
 });
 
 const defaultItems = [item1, item2, item3];
-
-
 
 app.get("/", (req, res) => {
 
@@ -83,6 +88,36 @@ app.get("/", (req, res) => {
         newListItems: foundItems
       });
     }
+  });
+});
+
+// Creating dynamic routes
+app.get('/:customListName', (req, res) => {
+  const customListName = req.params.customListName;
+
+  // Check if a list already exists in db
+  List.findOne({name: customListName}, function (err, foundLists) {
+    if(!err){
+      if(!foundLists){
+        // Create new list
+        const list = new List({
+          name: customListName,
+          items: defaultItems
+        });
+
+        // Save new List
+        list.save();
+
+        // Redirect to the dynamic route
+        res.redirect('/' + customListName);
+      } else {
+        // render list if it already exists
+        res.render('index', {
+          ListTitle: foundLists.name,
+          newListItems: foundLists.items
+        });
+      }
+    } else console.log(err);
   });
 });
 
@@ -121,14 +156,5 @@ app.post("/delete", (req, res) => {
 
 
 });
-
-
-app.get('/work', (req, res) => {
-  res.render('index', {
-    ListTitle: 'Work List',
-    newListItems: workItems
-  });
-});
-
 
 app.listen(3000, () => console.log(`Server is up and running on port 3000.`));
