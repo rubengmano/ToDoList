@@ -124,17 +124,31 @@ app.get('/:customListName', (req, res) => {
 app.post("/", (req, res) => {
 
   const itemName = req.body.newItem;
+  // get the list name
+  const listName = req.body.list;
   // Create the new item
   const item = new Item({
     name: itemName
   });
 
-  // save the new item into the collection
-  item.save();
+  // Check in which list we need to add the item
+  if(listName === 'Today'){
+    // save the new item into the collection
+    item.save();
 
-  // render the objects after adding them to the db
-  res.redirect('/');
-
+    // render the objects after adding them to the db
+    res.redirect('/');
+  } else {
+    // find the correct list
+    List.findOne({name: listName}, (err, foundList) => {
+      // Add the new item to the list
+      foundList.items.push(item);
+      // Save the List to the db
+      foundList.save();
+      // Redirect to the dynamic route
+      res.redirect('/' + listName);
+    });
+  }
 });
 
 // Delete Items
