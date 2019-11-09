@@ -4,6 +4,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 // require mongoose model
 const mongoose = require('mongoose');
+// require loadash model
+// const _ = require('loadash');
 
 // Make Mongoose use `findOneAndUpdate()`. Note that this option is `true`
 // by default, you need to set it to false.
@@ -26,7 +28,10 @@ app.use(express.static('public'));
 // let workItems = [];
 
 // connect and create or change to db
-mongoose.connect('mongodb://localhost/todolistDB', {useNewUrlParser: true, useUnifiedTopology: true });
+// mongoose.connect('mongodb://localhost/todolistDB', {useNewUrlParser: true, useUnifiedTopology: true });
+
+// connect to atlas
+mongoose.connect('mongodb+srv://admin-ruben:test123@cluster0-jv1su.mongodb.net/todolistDB', {useNewUrlParser: true, useUnifiedTopology: true });
 
 // Check if the connection was succefull
 var db = mongoose.connection;
@@ -93,7 +98,7 @@ app.get("/", (req, res) => {
 
 // Creating dynamic routes
 app.get('/:customListName', (req, res) => {
-  const customListName = req.params.customListName;
+  const customListName = req.params.customListName//_.capitalize(req.params.customListName);
 
   // Check if a list already exists in db
   List.findOne({name: customListName}, function (err, foundLists) {
@@ -157,16 +162,36 @@ app.post("/delete", (req, res) => {
   // get the item id
   const checkedItemId = req.body.checkbox;
 
-  // delete the item
-  Item.findByIdAndRemove(checkedItemId, function(err){
-    if(err) console.log(err);
-    else console.log(`Succefully deleted item with id: ${checkedItemId}`);
-  });
+  // get the list name
+  const listName = req.body.listName;
 
-  setTimeout(function(){
-    // render the objects after adding them to the db
-    res.redirect('/');
-  }, 100);
+  // Check in which list we need to add the item
+  if(listName === 'Today'){
+    // delete the item
+    Item.findByIdAndRemove(checkedItemId, function(err){
+      if(err) console.log(err);
+      else console.log(`Succefully deleted item with id: ${checkedItemId}`);
+    });
+
+    setTimeout(function(){
+      // render the objects after adding them to the db
+      res.redirect('/');
+    }, 100);
+  } else {
+    // find the correct list and remove with $pull
+    // 3 layers: pull, items and the item
+    List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}}, (err) => {
+      if(err) console.log(err);
+      else console.log("Delete was succefull");
+    });
+
+    setTimeout(() => {
+      // render the objects after adding them to the db
+      res.redirect('/' + listName);
+    }, 100);
+  }
+
+
 
 
 });
